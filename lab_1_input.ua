@@ -1,4 +1,3 @@
-
 # lab_1_input.ua
 
 def long_method(data):
@@ -22,3 +21,4 @@ def long_method(data):
 
 data = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
 print(long_method(data))
+
