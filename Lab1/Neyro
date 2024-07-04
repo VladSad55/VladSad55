@@ -1,0 +1,131 @@
+import numpy as np
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+import matplotlib.pyplot as plt
+
+# Область визначення для змінних
+universe = np.arange(-100, 100.1, 0.1)
+
+# Ініціалізація вхідних і вихідних змінних
+angle = ctrl.Antecedent(universe, 'angle')
+angular_velocity = ctrl.Antecedent(universe, 'angular_velocity')
+control_acceleration = ctrl.Consequent(universe, 'control_acceleration')
+
+# Терми для кожної змінної
+terms = ['term1', 'term2', 'term3', 'term4', 'term5', 'term6']
+angle.automf(names=terms)
+angular_velocity.automf(names=terms)
+control_acceleration.automf(names=terms)
+
+# Визначення функцій приналежності для кожного терму
+angle['term1'] = fuzz.trapmf(angle.universe, [-1000, -1000, -200, -100])
+angle['term2'] = fuzz.trapmf(angle.universe, [-100, -50, -50, -10])
+angle['term3'] = fuzz.trapmf(angle.universe, [-50, -10, 0, 0])
+angle['term4'] = fuzz.trapmf(angle.universe, [0, 0, 10, 50])
+angle['term5'] = fuzz.trapmf(angle.universe, [10, 50, 50, 100])
+angle['term6'] = fuzz.trapmf(angle.universe, [50, 100, 200, 1000])
+
+angular_velocity['term1'] = fuzz.trapmf(angular_velocity.universe, [-1000, -1000, -200, -100])
+angular_velocity['term2'] = fuzz.trapmf(angular_velocity.universe, [-100, -50, -50, -10])
+angular_velocity['term3'] = fuzz.trapmf(angular_velocity.universe, [-50, -10, 0, 0])
+angular_velocity['term4'] = fuzz.trapmf(angular_velocity.universe, [0, 0, 10, 50])
+angular_velocity['term5'] = fuzz.trapmf(angular_velocity.universe, [10, 50, 50, 100])
+angular_velocity['term6'] = fuzz.trapmf(angular_velocity.universe, [50, 100, 200, 1000])
+
+control_acceleration['term1'] = fuzz.trapmf(control_acceleration.universe, [-1000, -1000, -200, -100])
+control_acceleration['term2'] = fuzz.trapmf(control_acceleration.universe, [-100, -50, -50, -10])
+control_acceleration['term3'] = fuzz.trapmf(control_acceleration.universe, [-50, -10, 0, 0])
+control_acceleration['term4'] = fuzz.trapmf(control_acceleration.universe, [0, 0, 10, 50])
+control_acceleration['term5'] = fuzz.trapmf(control_acceleration.universe, [10, 50, 50, 100])
+control_acceleration['term6'] = fuzz.trapmf(control_acceleration.universe, [50, 100, 200, 1000])
+
+# Правила з наданої таблиці
+rules = [
+    ctrl.Rule(angle['term1'] & angular_velocity['term1'], control_acceleration['term6']),
+    ctrl.Rule(angle['term1'] & angular_velocity['term2'], control_acceleration['term6']),
+    ctrl.Rule(angle['term1'] & angular_velocity['term3'], control_acceleration['term6']),
+    ctrl.Rule(angle['term1'] & angular_velocity['term4'], control_acceleration['term6']),
+    ctrl.Rule(angle['term1'] & angular_velocity['term5'], control_acceleration['term6']),
+    ctrl.Rule(angle['term1'] & angular_velocity['term6'], control_acceleration['term6']),
+
+    ctrl.Rule(angle['term2'] & angular_velocity['term1'], control_acceleration['term6']),
+    ctrl.Rule(angle['term2'] & angular_velocity['term2'], control_acceleration['term6']),
+    ctrl.Rule(angle['term2'] & angular_velocity['term3'], control_acceleration['term6']),
+    ctrl.Rule(angle['term2'] & angular_velocity['term4'], control_acceleration['term5']),
+    ctrl.Rule(angle['term2'] & angular_velocity['term5'], control_acceleration['term5']),
+    ctrl.Rule(angle['term2'] & angular_velocity['term6'], control_acceleration['term5']),
+
+    ctrl.Rule(angle['term3'] & angular_velocity['term1'], control_acceleration['term6']),
+    ctrl.Rule(angle['term3'] & angular_velocity['term2'], control_acceleration['term6']),
+    ctrl.Rule(angle['term3'] & angular_velocity['term3'], control_acceleration['term6']),
+    ctrl.Rule(angle['term3'] & angular_velocity['term4'], control_acceleration['term5']),
+    ctrl.Rule(angle['term3'] & angular_velocity['term5'], control_acceleration['term5']),
+    ctrl.Rule(angle['term3'] & angular_velocity['term6'], control_acceleration['term5']),
+
+    ctrl.Rule(angle['term4'] & angular_velocity['term1'], control_acceleration['term2']),
+    ctrl.Rule(angle['term4'] & angular_velocity['term2'], control_acceleration['term2']),
+    ctrl.Rule(angle['term4'] & angular_velocity['term3'], control_acceleration['term2']),
+    ctrl.Rule(angle['term4'] & angular_velocity['term4'], control_acceleration['term1']),
+    ctrl.Rule(angle['term4'] & angular_velocity['term5'], control_acceleration['term1']),
+    ctrl.Rule(angle['term4'] & angular_velocity['term6'], control_acceleration['term1']),
+
+    ctrl.Rule(angle['term5'] & angular_velocity['term1'], control_acceleration['term2']),
+    ctrl.Rule(angle['term5'] & angular_velocity['term2'], control_acceleration['term2']),
+    ctrl.Rule(angle['term5'] & angular_velocity['term3'], control_acceleration['term2']),
+    ctrl.Rule(angle['term5'] & angular_velocity['term4'], control_acceleration['term1']),
+    ctrl.Rule(angle['term5'] & angular_velocity['term5'], control_acceleration['term1']),
+    ctrl.Rule(angle['term5'] & angular_velocity['term6'], control_acceleration['term1']),
+
+    ctrl.Rule(angle['term6'] & angular_velocity['term1'], control_acceleration['term1']),
+    ctrl.Rule(angle['term6'] & angular_velocity['term2'], control_acceleration['term1']),
+    ctrl.Rule(angle['term6'] & angular_velocity['term3'], control_acceleration['term1']),
+    ctrl.Rule(angle['term6'] & angular_velocity['term4'], control_acceleration['term1']),
+    ctrl.Rule(angle['term6'] & angular_velocity['term5'], control_acceleration['term1']),
+    ctrl.Rule(angle['term6'] & angular_velocity['term6'], control_acceleration['term1']),
+]
+
+# Константи для нормалізації та денормалізації
+phi_min = -np.pi
+phi_max = np.pi
+omega_min = -np.pi / 9
+omega_max = np.pi / 9
+mu_min = -np.pi / 36
+mu_max = np.pi / 36
+
+dmu = 0.1  # безрозмірний крок інтегрування
+
+# Функція для нормалізації
+def normalize(x, x_min, x_max):
+    return 200 * (x - x_min) / (x_max - x_min) - 100
+
+# Функція для денормалізації
+def denormalize(x_hat, x_min, x_max):
+    return (x_hat + 100) * (x_max - x_min) / 200 + x_min
+
+# Параметри симуляції
+T = 50  # загальний час моделювання в секундах
+dt = 0.01
+n_steps = int(T / dt)  # кількість кроків
+
+# Масиви для збереження даних
+phis = np.zeros(n_steps)  # кут
+omegas = np.zeros(n_steps)  # кутова швидкість
+mus = np.zeros(n_steps)  # керуючий вплив
+
+# Початкові умови
+phi = np.deg2rad(40)  # Початковий кут у радіанах
+omega = np.deg2rad(4)  # Початкова кутова швидкість в радіанах за секунду
+
+for i in range(n_steps):
+    # Збереження значень у масиви
+    phis[i] = phi
+    omegas[i] = omega
+
+    # Нормалізація значень
+    phi_normalized = normalize(phi, phi_min, phi_max)
+    omega_normalized = normalize(omega, omega_min, omega_max)
+
+    # Перевірка фазифікації
+    phi_membership = {
+        'term1': fuzz.interp_membership(angle.universe, angle['term1'].mf, phi_normalized),
+        'term2
